@@ -1,4 +1,5 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const chromium = require('chrome-aws-lambda');
 
 // Liste des sports à scraper
 const sports = [
@@ -55,10 +56,12 @@ exports.handler = async (event, context) => {
     try {
         console.log("Handler triggered");
         console.log("Launching Puppeteer");
-        const browser = await puppeteer.launch({
-            headless: true, // Mode headless pour Netlify
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            ignoreHTTPSErrors: true
+        const browser = await chromium.puppeteer.launch({
+            args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
         });
         console.log("Puppeteer launched");
 
