@@ -1,6 +1,6 @@
 [build]
-  command = ""
-  publish = ""
+  command = "echo 'No build step required'"
+  publish = "public"
 
 [functions]
   directory = "netlify/functions"
