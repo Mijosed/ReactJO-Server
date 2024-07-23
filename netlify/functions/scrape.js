@@ -1,17 +1,11 @@
-const express = require('express');
 const puppeteer = require('puppeteer');
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-// Liste des sports à scraper
-const sports = ["athletisme", "natation", "basketball"];
-
-app.get('/scrape', async (req, res) => {
+exports.handler = async function(event, context) {
     try {
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
 
+        const sports = ["athletisme", "natation", "basketball"];
         const sportsData = await Promise.all(sports.map(async sport => {
             const url = `https://olympics.com/fr/paris-2024/sports/${sport}`;
             await page.goto(url, { waitUntil: 'networkidle2' });
@@ -34,13 +28,15 @@ app.get('/scrape', async (req, res) => {
 
         await browser.close();
 
-        res.json(sportsData);
+        return {
+            statusCode: 200,
+            body: JSON.stringify(sportsData),
+        };
     } catch (error) {
         console.error('Erreur lors du scraping des données :', error);
-        res.status(500).send('Erreur lors du scraping des données');
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Erreur lors du scraping des données' }),
+        };
     }
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+};
