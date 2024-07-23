@@ -1,8 +1,4 @@
-const express = require('express');
 const puppeteer = require('puppeteer');
-
-const app = express();
-const port = 3000;
 
 // Liste des sports à scraper
 const sports = [
@@ -49,18 +45,18 @@ const sports = [
     "triathlon", 
     "voile", 
     "volleyball", 
-    "beach-volley", 
+    "volleyball-de-plage", 
     "water-polo"
 ];
 
 const MAX_CONCURRENT_PAGES = 5; // Limite le nombre de pages ouvertes simultanément
 
-app.get('/scrape', async (req, res) => {
+exports.handler = async (event, context) => {
     try {
         console.log("Handler triggered");
         console.log("Launching Puppeteer");
         const browser = await puppeteer.launch({
-            headless: false, // Mode headful pour le débogage
+            headless: true, // Mode headless pour Netlify
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
             ignoreHTTPSErrors: true
         });
@@ -92,7 +88,6 @@ app.get('/scrape', async (req, res) => {
             return data;
         };
 
-        const queue = [];
         const results = [];
         for (let i = 0; i < sports.length; i += MAX_CONCURRENT_PAGES) {
             const chunk = sports.slice(i, i + MAX_CONCURRENT_PAGES);
@@ -103,13 +98,15 @@ app.get('/scrape', async (req, res) => {
         await browser.close();
         console.log("Browser closed");
 
-        res.json(results);
+        return {
+            statusCode: 200,
+            body: JSON.stringify(results)
+        };
     } catch (error) {
         console.error('Erreur lors du scraping des données :', error);
-        res.status(500).send({ error: 'Erreur lors du scraping des données', details: error.message });
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Erreur lors du scraping des données', details: error.message })
+        };
     }
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+};
