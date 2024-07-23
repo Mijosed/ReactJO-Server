@@ -2,15 +2,14 @@
   "name": "server",
   "version": "1.0.0",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "scripts": {
-    "start": "node server.js",
     "build": "echo 'No build step required'"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "puppeteer-core": "10.4.0",
+    "puppeteer-core": "10.1.0",
     "chrome-aws-lambda": "10.1.0"
   }
 }
